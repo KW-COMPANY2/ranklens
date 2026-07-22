@@ -1,5 +1,6 @@
 const $ = (id) => document.getElementById(id);
 
+// ===== 起動時：Closed Loopの学習状況バッジを表示 =====
 (async function loadLoopBadge() {
   try {
     const res = await fetch(`${API_BASE}/api/stats`);
@@ -18,7 +19,6 @@ $("runBtn").addEventListener("click", async () => {
     .map((k) => k.trim())
     .filter(Boolean);
 
-  // ドメインは必須項目
   if (!domain) {
     $("status").innerHTML = `<span class="err">ドメインは必須です（例：example.com）</span>`;
     $("domain").focus();
@@ -30,7 +30,7 @@ $("runBtn").addEventListener("click", async () => {
     return;
   }
 
-  $("status").textContent = "検索・構造分析中…";
+  $("status").textContent = "検索・構造分析中…（検索結果10ページ分をチェックしています）";
   $("results").innerHTML = "";
   $("runBtn").disabled = true;
 
@@ -49,6 +49,14 @@ $("runBtn").addEventListener("click", async () => {
     if (typeof data.knowledgeCount === "number") {
       $("loopBadge").textContent = `🔄 学習した知見：${data.knowledgeCount}件（運用するほど賢くなります）`;
     }
+
+    // 対象範囲の説明を1回だけ表示
+    const note = document.createElement("div");
+    note.className = "scope-note";
+    note.innerHTML =
+      `ℹ️ この分析は、Googleの検索結果<strong>10ページ以内（およそ100位以内）</strong>に表示されているドメインが対象です。ここに入っていないページは「評価を受けている」とはみなしていません。`;
+    $("results").appendChild(note);
+
     data.results.forEach(renderResult);
   } catch (e) {
     $("status").innerHTML = `<span class="err">エラー：${e.message}</span>`;
@@ -78,26 +86,29 @@ function renderResult(r) {
   // === 主軸：評価先URLの強調バナー ===
   let heroHtml = "";
   if (r.evalPrimary) {
+    const p = r.evalPrimary;
     const others = r.evalOthers && r.evalOthers.length
-      ? `<div class="hero-others">その他の評価ページ：${r.evalOthers
-          .map((o) => `<code>${o.display}</code>（${o.position}位）`)
+      ? `<div class="hero-others">その他の表示ページ：${r.evalOthers
+          .map((o) => `<code>${o.display}</code>（${o.positionLabel}）`)
           .join(" / ")}</div>`
       : "";
     heroHtml = `
       <div class="hero-url">
         <div class="hero-label">現在の評価先URLは→</div>
         <div class="hero-value">
-          <span id="heroval-${r.feedbackId}">${r.evalPrimary.display}</span>
-          <button class="copy-btn" data-copy="${r.evalPrimary.display}">📋 コピー</button>
+          <span>${p.display}</span>
+          <button class="copy-btn" data-copy="${p.display}">📋 コピー</button>
         </div>
-        <div class="hero-meta">${r.evalPrimary.position}位 ／ ${r.evalPrimary.type}</div>
+        <div class="hero-position">📍 <strong>表示位置：</strong>${p.positionLabel}<span class="band-tag">${p.band}</span></div>
+        <div class="hero-meta">ページ種別：${p.type}</div>
+        <div class="hero-why">💡 <strong>なぜ表示されているか（推測）：</strong>${p.why}</div>
         ${others}
       </div>`;
   } else {
     heroHtml = `
       <div class="hero-url hero-none">
         <div class="hero-label">現在の評価先URLは→</div>
-        <div class="hero-value-none">このキーワードでは、あなたのドメインは検索結果に表示されていません。</div>
+        <div class="hero-value-none">Googleの検索結果<strong>10ページ以内</strong>には、あなたのドメインは表示されていないようです。<br>（10ページ以内に入っていないため、このキーワードでは「評価を受けている」とはみなしていません。）</div>
       </div>`;
   }
 
@@ -128,7 +139,7 @@ function renderResult(r) {
     ? r.mine
         .map((m) => `<li><strong>${m.type}</strong>：<a href="${m.url}" target="_blank" rel="noopener">${m.url}</a></li>`)
         .join("")
-    : "<li>このキーワードのSERPに自社ページは表示されていません。</li>";
+    : "<li>Googleの検索結果10ページ以内には、あなたのドメインは表示されていないようです。</li>";
 
   const div = document.createElement("div");
   div.className = "result-item";
@@ -145,7 +156,7 @@ function renderResult(r) {
     </div>
 
     <div class="mine-box">
-      <strong>あなたのドメインの評価ページ：</strong>
+      <strong>あなたのドメインの表示ページ：</strong>
       <ul>${mineHtml}</ul>
     </div>
 
@@ -166,7 +177,6 @@ function renderResult(r) {
     </div>
   `;
 
-  // コピーボタン
   const copyBtn = div.querySelector(".copy-btn");
   if (copyBtn) {
     copyBtn.addEventListener("click", () => copyText(copyBtn.dataset.copy, copyBtn));
@@ -193,7 +203,6 @@ async function sendFeedback(feedbackId, verdict, insight, div) {
       ? "<small>✅ URL構造の知見として学習しました（次回分析に活かされます）</small>"
       : "<small>記録しました（今後この傾向は避けます）</small>";
 
-  // 学習件数バッジを更新
   try {
     const res = await fetch(`${API_BASE}/api/stats`);
     const st = await res.json();
