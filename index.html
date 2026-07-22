@@ -1,0 +1,39 @@
+<!-- Output: html -->
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RankLens ｜ 評価ページ構造アナライザー</title>
+  <meta name="description" content="RankLens - Googleがどのページ(URL構造)を評価しているかを見抜く、評価ページ構造アナライザー" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <h1>RankLens</h1>
+    <p class="sub">評価ページ構造アナライザー｜運用するほど賢くなる Closed Loop 型ツール</p>
+  </header>
+
+  <main>
+    <section class="card">
+      <label>あなたのドメイン（任意・入力すると自社ページを★表示）
+        <input id="domain" type="text" placeholder="example.com（空欄でもOK）" />
+      </label>
+      <label>調べたいキーワード（改行区切りで複数可）
+        <textarea id="keywords" rows="4" placeholder="SEO&#10;コンテンツ マーケティング"></textarea>
+      </label>
+      <button id="runBtn">評価ページ構造を分析する</button>
+      <p id="status" class="status"></p>
+    </section>
+
+    <section id="results"></section>
+  </main>
+
+  <footer>
+    <small>© RankLens - 完全無料構成 / Cloudflare Workers + SerpApi + Gemini</small>
+  </footer>
+
+  <script src="config.js"></script>
+  <script src="main.js"></script>
+</body>
+</html>
