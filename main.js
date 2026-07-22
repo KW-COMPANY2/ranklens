@@ -1,6 +1,5 @@
 const $ = (id) => document.getElementById(id);
 
-// ===== 起動時：Closed Loopの学習状況バッジを表示 =====
 (async function loadLoopBadge() {
   try {
     const res = await fetch(`${API_BASE}/api/stats`);
@@ -201,7 +200,7 @@ async function sendFeedback(feedbackId, verdict, insight, div) {
   div.querySelector(".fb-btns").innerHTML =
     verdict === "up"
       ? "<small>✅ URL構造の知見として学習しました（次回分析に活かされます）</small>"
-      : "<small>記録しました（今後この傾向は避けます）</small>";
+      : "<small>記録しました</small>";
 
   try {
     const res = await fetch(`${API_BASE}/api/stats`);
