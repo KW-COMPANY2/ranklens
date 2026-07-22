@@ -1,4 +1,3 @@
-// File: main.js - RankLens
 const $ = (id) => document.getElementById(id);
 
 $("runBtn").addEventListener("click", async () => {
