@@ -380,7 +380,6 @@ footer { text-align: center; padding: 28px; color: #94a3b8; font-size: 13px; }
   font-weight: 700;
 }
 
-/* === レスポンシブ微調整 === */
 @media (max-width: 640px) {
   header h1 { font-size: 25px; }
   .card, .result-item { padding: 18px; }
