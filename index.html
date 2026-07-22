@@ -1,3 +1,4 @@
+<!-- Output: html -->
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -11,14 +12,16 @@
   <header>
     <h1>RankLens</h1>
     <p class="sub">評価ページ構造アナライザー｜運用するほど賢くなる</p>
+    <p id="loopBadge" class="loop-badge">🔄 学習した知見：読み込み中…</p>
   </header>
 
   <main>
     <section class="card">
-      <label>あなたのドメイン（任意・入力すると自社ページを★表示）
-        <input id="domain" type="text" placeholder="example.com（空欄でもOK）" />
+      <label>あなたのドメイン <span class="req">*必須</span>
+        <input id="domain" type="text" placeholder="例：example.com / http://example.com/ どちらでもOK" />
+        <small class="hint">http:// の有無、末尾の / の有無、どれでも動きます。</small>
       </label>
-      <label>調べたいキーワード（改行区切りで複数可）
+      <label>調べたいキーワード（改行区切りで複数可） <span class="req">*必須</span>
         <textarea id="keywords" rows="4" placeholder="SEO&#10;コンテンツ マーケティング"></textarea>
       </label>
       <button id="runBtn">評価ページ構造を分析する</button>
